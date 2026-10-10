@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My WebAR Art Exhibition</title>
+  
+  <!-- Main A-Frame Library -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <!-- MindAR Extension for A-Frame -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+</head>
+<body style="margin: 0; overflow: hidden;">
+
+  <!-- AR Scene: Points directly to your targets.mind tracking file -->
+  <a-scene mindar-image="imageTargetSrc: ./targets.mind;" 
+           color-space="sRGB" 
+           renderer="colorManagement: true, physicallyCorrectLights: true" 
+           vr-mode-ui="enabled: false" 
+           device-orientation-permission-ui="enabled: false">
+    
+    <a-assets>
+      <!-- Define the video asset. It is muted to bypass modern browser autoplay restrictions -->
+      <video id="gifVideo" src="./popup.mp4" loop="true" crossorigin="anonymous" playsinline webkit-playsinline muted></video>
+    </a-assets>
+
+    <!-- Static Camera Object -->
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <!-- AR Anchor: Maps to targetIndex: 0 (the first artwork in your .mind file) -->
+    <a-entity id="artTarget" mindar-image-target="targetIndex: 0">
+      <!-- 2D Plane displaying the video. Position Z=0.1 hovers it slightly in front of the artwork -->
+      <a-video src="#gifVideo" position="0 0 0.1" width="1" height="1" rotation="0 0 0"></a-video>
+    </a-entity>
+    
+  </a-scene>
+
+  <!-- Interactive JavaScript to control video play/pause functions based on tracking visibility -->
+  <script>
+    const targetElement = document.querySelector('#artTarget');
+    const videoElement = document.querySelector('#gifVideo');
+
+    targetElement.addEventListener("targetFound", () => {
+      videoElement.play().catch(err => console.log("Autoplay blocked:", err));
+    });
+
+    targetElement.addEventListener("targetLost", () => {
+      videoElement.pause();
+    });
+  </script>
+</body>
+</html>
